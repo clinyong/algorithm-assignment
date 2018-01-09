@@ -1,8 +1,10 @@
 import edu.princeton.cs.algs4.StdRandom;
+import edu.princeton.cs.algs4.StdStats;
 
 public class PercolationStats {
-    private double[] fractionList;
-    private int trials;
+    private static final double FACTOR = 1.96;
+    private final double[] fractionList;
+    private final int trials;
 
     public PercolationStats(int n, int trials) {
         fractionList = new double[trials];
@@ -24,32 +26,21 @@ public class PercolationStats {
     }
 
     public double mean() {
-        double total = 0;
-        for (int i = 0; i < this.trials; i++) {
-            total += this.fractionList[i];
-        }
-
-        return total / this.trials;
+        return StdStats.mean(this.fractionList);
     }
 
     public double stddev() {
-        double m = this.mean();
-
-        double total = 0.0;
-        for (int i = 0; i < this.trials; i++) {
-            double tmp = (this.fractionList[i] - m);
-            total = tmp * tmp + total;
-        }
-
-        return total / (this.trials - 1);
+        return StdStats.stddev(this.fractionList);
     }
 
     public double confidenceLo() {
-        return this.mean() - Math.sqrt(1.96 * 1.96 * this.stddev() / this.trials);
+        double i = PercolationStats.FACTOR * PercolationStats.FACTOR;
+        return this.mean() - Math.sqrt(i * this.stddev() / this.trials);
     }
 
     public double confidenceHi() {
-        return this.mean() + Math.sqrt(1.96 * 1.96 * this.stddev() / this.trials);
+        double i = PercolationStats.FACTOR * PercolationStats.FACTOR;
+        return this.mean() + Math.sqrt(i * this.stddev() / this.trials);
     }
 
     public static void main(String[] args) {
