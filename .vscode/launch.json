@@ -1,0 +1,42 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Debug (Launch)-PercolationStats",
+            "request": "launch",
+            "sourcePaths": [
+                "${workspaceFolder}/week1",
+            ],
+            "classPaths": [
+                "${workspaceFolder}/week1",
+                "/usr/local/algs4/algs4.jar"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "PercolationStats",
+            "args": "5 5"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-TestAlgs4",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "TestAlgs4",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Attach)",
+            "request": "attach",
+            "hostName": "localhost",
+            "port": 0
+        }
+    ]
+}
