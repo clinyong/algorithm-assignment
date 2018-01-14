@@ -1,25 +1,29 @@
-import edu.princeton.cs.algs4.StdRandom;
 
 // the row and column indices are integers between 1 and n
+import edu.princeton.cs.algs4.In;
 
 public class Percolation {
     private int[] id;
     private int[] sz;
-    private int[] openList;
+    private boolean[] openList;
     private int countOpen;
-    private int maxN;
-    private int topVIndex;
-    private int bottomVIndex;
+    private final int maxN;
+    private final int topVIndex;
+    private final int bottomVIndex;
 
     public Percolation(int n) {
+        if (n <= 0) {
+            throw new IllegalArgumentException();
+        }
+
         int flatN = n * n;
         id = new int[flatN + 2];
         sz = new int[flatN + 2];
-        openList = new int[flatN + 2];
+        openList = new boolean[flatN + 2];
         for (int i = 0; i < flatN + 2; i++) {
             id[i] = i;
             sz[i] = 1;
-            openList[i] = 0;
+            openList[i] = false;
         }
         countOpen = 0;
         maxN = n;
@@ -29,6 +33,8 @@ public class Percolation {
 
         this.sz[this.topVIndex] = n;
         this.sz[this.bottomVIndex] = n;
+        this.openList[this.topVIndex] = true;
+        this.openList[this.bottomVIndex] = true;
 
         for (int i = 0; i < n; i++) {
             int topIndex = this.getFlatIndex(1, i + 1);
@@ -69,32 +75,47 @@ public class Percolation {
         }
     }
 
+    private void checkArguments(int row, int col) {
+        if (row <= 0 || row > this.maxN || col <= 0 || col > this.maxN) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     public void open(int row, int col) {
+        this.checkArguments(row, col);
+
         if (!isOpen(row, col)) {
             int p = getFlatIndex(row, col);
-            this.openList[p] = 1;
+            this.openList[p] = true;
 
-            if (row > 1 && isOpen(row - 1, col)) {
-                union(p, p - maxN);
-            }
+            if (maxN > 1) {
+                if (row > 1 && isOpen(row - 1, col)) {
+                    union(p, p - maxN);
+                }
 
-            if (row < maxN && isOpen(row + 1, col)) {
-                union(p, p + maxN);
-            }
+                if (row < maxN && isOpen(row + 1, col)) {
+                    union(p, p + maxN);
+                }
 
-            if (col > 1 && isOpen(row, col - 1)) {
-                union(p, p - 1);
-            }
-            if (col < maxN && isOpen(row, col + 1)) {
-                union(p, p + 1);
+                if (col > 1 && isOpen(row, col - 1)) {
+                    union(p, p - 1);
+                }
+                if (col < maxN && isOpen(row, col + 1)) {
+                    union(p, p + 1);
+                }
+            } else {
+                // maxN == 1
+                union(this.topVIndex, this.bottomVIndex);
             }
             countOpen += 1;
         }
     }
 
     public boolean isOpen(int row, int col) {
+        this.checkArguments(row, col);
+
         int p = getFlatIndex(row, col);
-        return this.openList[p] == 1;
+        return this.openList[p];
     }
 
     public int numberOfOpenSites() {
@@ -102,40 +123,29 @@ public class Percolation {
     }
 
     public boolean isFull(int row, int col) {
-        if (row == 1) {
-            return true;
-        }
+        this.checkArguments(row, col);
 
-        int p = getFlatIndex(row, col);
-        boolean full = false;
-        for (int i = 0; i < maxN; i++) {
-            if (connected(p, i)) {
-                full = true;
-                break;
-            }
-        }
-
-        return full;
+        int p = this.getFlatIndex(row, col);
+        return this.isOpen(row, col) && this.connected(p, this.topVIndex);
     }
 
     public boolean percolates() {
         return this.connected(this.topVIndex, this.bottomVIndex);
     }
 
-    // public static void main(String[] args) {
-    //     int n = Integer.parseInt(args[0]);
-    //     Percolation p = new Percolation(n);
+    public static void main(String[] args) {
+        In in = new In(args[0]); // input file
+        int n = in.readInt(); // n-by-n percolation system
 
-    //     int count = 0;
-    //     while (!p.percolates()) {
-    //         int row = StdRandom.uniform(n) + 1;
-    //         int col = StdRandom.uniform(n) + 1;
-    //         if (!p.isOpen(row, col)) {
-    //             p.open(row, col);
-    //             count += 1;
-    //         }
-    //     }
+        Percolation perc = new Percolation(n);
 
-    //     System.out.println(count);
-    // }
+        int count = 0;
+        while (!in.isEmpty()) {
+            int i = in.readInt();
+            int j = in.readInt();
+            perc.open(i, j);
+            count += 1;
+            System.out.printf("%d (%d, %d): %b, %d\n", count, i, j, perc.isFull(2, 1), perc.root(6));
+        }
+    }
 }
